@@ -16,7 +16,7 @@ import java.util.List;
 
 @Service//this is my custom service authentication
 @AllArgsConstructor
-public class CustomUserDetails implements UserDetailsService {
+public class CustomUserDetails implements UserDetailsService {//Now User DetailService is Based on this implementation not the default of spring
 
     private CustomerRepository customerRepository;
 
