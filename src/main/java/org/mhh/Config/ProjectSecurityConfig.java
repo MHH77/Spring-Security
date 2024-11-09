@@ -15,7 +15,7 @@ public class ProjectSecurityConfig {
         //spring security by default block all the post and put and other http method that change data in backend or database by csrf
         http.csrf().disable()
                 .authorizeHttpRequests().requestMatchers("/myAccount", "/myLoans", "/myCards", "/myBalance").authenticated()
-                .requestMatchers("/contract", "/notices","/user/register").permitAll()
+                .requestMatchers("/contract", "/notices","/user/register","/actuator/**").permitAll()
                 .and().formLogin()
                 .and().httpBasic();
         return http.build();
