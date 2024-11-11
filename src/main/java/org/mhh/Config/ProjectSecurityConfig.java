@@ -1,12 +1,17 @@
 package org.mhh.Config;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.mhh.Filters.CsrfCookieFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -17,8 +22,13 @@ public class ProjectSecurityConfig {
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        //spring security by default block all the post and put and other http method that change data in backend or database by csrf
-        http.cors().configurationSource(new CorsConfigurationSource() {
+        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+        requestHandler.setCsrfRequestAttributeName("_csrf");
+        //store all credential by framework automatically
+        http.securityContext().requireExplicitSave(false)
+                // when using separate UI application , I want to just login once note when every request comes form ui application have to log in again
+                .and().sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+                .cors().configurationSource(new CorsConfigurationSource() {
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                         CorsConfiguration corsConfiguration = new CorsConfiguration();
@@ -30,8 +40,13 @@ public class ProjectSecurityConfig {
                         corsConfiguration.setMaxAge(3600L);
                         return corsConfiguration;
                     }
-                }).and()
-                .csrf().disable()
+                    //api that don't want to check CSRF (cause is GET or on my business like public api)
+                }).and().csrf((csrf) -> csrf.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers("/contract", "/notices", "/user/register", "/actuator/**")
+                        //CookieCsrfTokenRepository Responsible fot csrf token in cookie
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                //add filter to return token to in response
+                //first call CsrfCookieFilter filter then  BasicAuthenticationFilter filter
+                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests().requestMatchers("/myAccount", "/myLoans", "/myCards", "/myBalance").authenticated()
                 .requestMatchers("/contract", "/notices", "/user/register", "/actuator/**").permitAll()
                 .and().formLogin()
