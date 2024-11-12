@@ -1,6 +1,7 @@
 package org.mhh.Config;
 
 import lombok.AllArgsConstructor;
+import org.mhh.Model.Authority;
 import org.mhh.Model.Customer;
 import org.mhh.Repository.CustomerRepository;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @AllArgsConstructor
@@ -30,9 +32,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         List<Customer> customers = customerRepository.findByEmail(name);//load form database
         if (!customers.isEmpty()) {
             if (passwordEncoder.matches(pwd, customers.get(0).getPwd())) {
-                List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-                grantedAuthorities.add(new SimpleGrantedAuthority(customers.get(0).getRole()));
-                return new UsernamePasswordAuthenticationToken(name, pwd, grantedAuthorities);
+                return new UsernamePasswordAuthenticationToken(name, pwd, getGrantedAuthorities(customers.get(0).getAuthorities()));
             } else {
                 throw new BadCredentialsException("Invalid password");
             }
@@ -40,6 +40,15 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         } else {
             throw new BadCredentialsException("User not found");
         }
+    }
+
+    //helper method for fetch authorities that store in database for per user
+    private List<GrantedAuthority> getGrantedAuthorities(Set<Authority> authorities) {
+        List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+        for (Authority authority : authorities) {
+            grantedAuthorities.add(new SimpleGrantedAuthority(authority.getClass().getName()));
+        }
+        return grantedAuthorities;
     }
 
     @Override

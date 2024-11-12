@@ -6,10 +6,7 @@ import org.mhh.Service.LoginService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
@@ -19,21 +16,18 @@ public class LoginController {
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody Customer customer) {
+    public ResponseEntity<Customer> registerUser(@RequestBody Customer customer) {
         //before save in database convert password (plain text) to hash and then save in database
         String hashPwd = passwordEncoder.encode(customer.getPwd());
         customer.setPwd(hashPwd);
-
         Customer registeredUser = loginService.registerUser(customer);
-        ResponseEntity responseEntity = null;
         if (registeredUser.getId() > 0) {
-            return responseEntity = ResponseEntity.status(HttpStatus.CREATED)
+            return ResponseEntity.status(HttpStatus.CREATED)
                     .body(registeredUser);
         } else {
-            return responseEntity = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("register not Succesfully!");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
         }
-
     }
 
 }
