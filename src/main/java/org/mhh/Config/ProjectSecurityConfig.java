@@ -47,8 +47,13 @@ public class ProjectSecurityConfig {
                 //add filter to return token to in response
                 //first call CsrfCookieFilter filter then  BasicAuthenticationFilter filter
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
-                .authorizeHttpRequests().requestMatchers("/myAccount", "/myLoans", "/myCards", "/myBalance").authenticated()
-                .requestMatchers("/contract", "/notices", "/user/register", "/actuator/**").permitAll()
+                .authorizeHttpRequests()
+                .requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
+                .requestMatchers( "/myLoans").hasAuthority("VIEWLOANS")
+                .requestMatchers( "/myCards").hasAuthority("VIEWCARDS")
+                .requestMatchers("/myBalance").hasAnyAuthority("VIEWBALANCE","VIEWACCOUNT")
+                .requestMatchers("/user/register","/actuator/**").authenticated()
+                .requestMatchers("/contract", "/notices").permitAll()
                 .and().formLogin()
                 .and().httpBasic();
         return http.build();

@@ -11,9 +11,9 @@ CREATE TABLE authority (
                            FOREIGN KEY (customer_id) REFERENCES customer(customer_id)
 );
 CREATE INDEX idx_customer_id ON authority (customer_id);
-INSERT IGNORE INTO `authority` (name, customer_id) VALUES ('READ_PRIVILEGES', 1);
-INSERT IGNORE INTO `authority` (name, customer_id) VALUES ('WRITE_PRIVILEGES', 1);
-INSERT IGNORE INTO `authority` (name, customer_id) VALUES ('ADMIN_PRIVILEGES', 2);
+INSERT IGNORE INTO `authority` (name, customer_id) VALUES ('ROLE_USER', 1);
+INSERT IGNORE INTO `authority` (name, customer_id) VALUES ('ROLE_ADMIN', 1);
+INSERT IGNORE INTO `authority` (name, customer_id) VALUES ('ROLE_USER', 2);
 
 CREATE TABLE customer (
                           customer_id BIGINT AUTO_INCREMENT PRIMARY KEY,
