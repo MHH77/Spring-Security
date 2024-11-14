@@ -1,11 +1,12 @@
 package org.mhh.Model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "authority")
 @AllArgsConstructor
 @RequiredArgsConstructor
