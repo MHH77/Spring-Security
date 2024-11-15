@@ -48,12 +48,11 @@ public class ProjectSecurityConfig {
                 //first call CsrfCookieFilter filter then  BasicAuthenticationFilter filter
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests()
-                .requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
-                .requestMatchers( "/myLoans").hasAuthority("VIEWLOANS")
-                .requestMatchers( "/myCards").hasAuthority("VIEWCARDS")
-                .requestMatchers("/myBalance").hasAnyAuthority("VIEWBALANCE","VIEWACCOUNT")
-                .requestMatchers("/user/register","/actuator/**").authenticated()
-                .requestMatchers("/contract", "/notices").permitAll()
+                .requestMatchers("/myAccount").hasRole("USER")
+                .requestMatchers("/myLoans").hasRole("USER")
+                .requestMatchers("/myCards").hasRole("USER")
+                .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/contract", "/notices", "/user/register", "/actuator/**").permitAll()
                 .and().formLogin()
                 .and().httpBasic();
         return http.build();

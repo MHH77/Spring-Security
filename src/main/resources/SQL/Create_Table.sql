@@ -11,6 +11,10 @@ CREATE TABLE authority (
                            FOREIGN KEY (customer_id) REFERENCES customer(customer_id)
 );
 CREATE INDEX idx_customer_id ON authority (customer_id);
+--For authorities
+INSERT IGNORE INTO `authority` (name, customer_id) VALUES ('VIEWACCOUNT', 1);
+INSERT IGNORE INTO `authority` (name, customer_id) VALUES ('VIEWCARDS', 1);
+--For Role
 INSERT IGNORE INTO `authority` (name, customer_id) VALUES ('ROLE_USER', 1);
 INSERT IGNORE INTO `authority` (name, customer_id) VALUES ('ROLE_ADMIN', 1);
 INSERT IGNORE INTO `authority` (name, customer_id) VALUES ('ROLE_USER', 2);
