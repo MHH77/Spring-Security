@@ -2,6 +2,7 @@ package org.mhh.Config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.mhh.Filters.CsrfCookieFilter;
+import org.mhh.Filters.ValidationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -47,6 +48,7 @@ public class ProjectSecurityConfig {
                 //add filter to return token to in response
                 //first call CsrfCookieFilter filter then  BasicAuthenticationFilter filter
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+                .addFilterBefore(new ValidationFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests()
                 .requestMatchers("/myAccount").hasRole("USER")
                 .requestMatchers("/myLoans").hasRole("USER")
