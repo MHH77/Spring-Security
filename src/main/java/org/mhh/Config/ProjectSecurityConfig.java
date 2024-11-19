@@ -1,6 +1,7 @@
 package org.mhh.Config;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.mhh.Filters.AuthenticationLoggingAtFilter;
 import org.mhh.Filters.AuthoritiesLoiteringFilter;
 import org.mhh.Filters.CsrfCookieFilter;
 import org.mhh.Filters.ValidationFilter;
@@ -50,7 +51,8 @@ public class ProjectSecurityConfig {
                 //first call CsrfCookieFilter filter then  BasicAuthenticationFilter filter
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new ValidationFilter(), BasicAuthenticationFilter.class)
-                .addFilterAfter(new AuthoritiesLoiteringFilter(),AuthoritiesLoiteringFilter.class)
+                .addFilterAfter(new AuthoritiesLoiteringFilter(), AuthoritiesLoiteringFilter.class)
+                .addFilterAt(new AuthenticationLoggingAtFilter(), AuthoritiesLoiteringFilter.class)
                 .authorizeHttpRequests()
                 .requestMatchers("/myAccount").hasRole("USER")
                 .requestMatchers("/myLoans").hasRole("USER")
