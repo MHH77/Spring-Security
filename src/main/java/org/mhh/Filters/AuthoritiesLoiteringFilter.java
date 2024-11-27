@@ -16,7 +16,9 @@ public class AuthoritiesLoiteringFilter implements Filter {
             throws IOException, ServletException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
-            LOG.info("User: " + authentication.getName() + "is successfully authenticated and has authorities"
+            //this filter is call for every request (even user send first logging before authentication)
+            // log user details and  her authorities after the log in is successfully
+            LOG.info("User: " + authentication.getName() + " is successfully authenticated and has authorities"
                     + authentication.getAuthorities().toString());
         }
         filterChain.doFilter(servletRequest, servletResponse);

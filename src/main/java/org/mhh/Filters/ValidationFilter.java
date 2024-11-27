@@ -16,6 +16,7 @@ import static org.springframework.security.web.authentication.www.BasicAuthentic
 public class ValidationFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+        //this filter is call for every request (even user send first logging before authentication)
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         String header = request.getHeader(AUTHORIZATION);
