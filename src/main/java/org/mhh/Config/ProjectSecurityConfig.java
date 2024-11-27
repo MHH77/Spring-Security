@@ -1,10 +1,7 @@
 package org.mhh.Config;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.mhh.Filters.AuthenticationLoggingAtFilter;
-import org.mhh.Filters.AuthoritiesLoiteringFilter;
-import org.mhh.Filters.CsrfCookieFilter;
-import org.mhh.Filters.ValidationFilter;
+import org.mhh.Filters.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,6 +15,7 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
@@ -35,24 +33,20 @@ public class ProjectSecurityConfig {
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                         CorsConfiguration corsConfiguration = new CorsConfiguration();
-                        //other domain address that want to use my app
                         corsConfiguration.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
                         corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
                         corsConfiguration.setAllowCredentials(true);
                         corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
+                        corsConfiguration.setExposedHeaders(Arrays.asList("Authorization"));
                         corsConfiguration.setMaxAge(3600L);
                         return corsConfiguration;
                     }
-                    //api that don't want to check CSRF (cause is GET or on my business like public api)
                 }).and().csrf((csrf) -> csrf.csrfTokenRequestHandler(requestHandler).ignoringRequestMatchers("/contract", "/notices", "/user/register", "/actuator/**")
-                        //CookieCsrfTokenRepository Responsible fot csrf token in cookie
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-                //add filter to return token to in response
-                //first call CsrfCookieFilter filter then  BasicAuthenticationFilter filter
-                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
-                .addFilterBefore(new ValidationFilter(), BasicAuthenticationFilter.class)
-                .addFilterAfter(new AuthoritiesLoiteringFilter(), AuthoritiesLoiteringFilter.class)
-                .addFilterAt(new AuthenticationLoggingAtFilter(), AuthoritiesLoiteringFilter.class)
+                .addFilterBefore(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)  // ابتدا JWTTokenGeneratorFilter را اضافه کنید
+                .addFilterBefore(new AuthoritiesLoiteringFilter(), JWTTokenGeneratorFilter.class)  // سپس AuthoritiesLoiteringFilter را اضافه کنید
+                .addFilterAfter(new ValidationFilter(), BasicAuthenticationFilter.class)  // فیلتر ValidationFilter باید بعد از BasicAuthenticationFilter باشد
+                .addFilterAt(new AuthenticationLoggingAtFilter(), AuthoritiesLoiteringFilter.class)  // اگر می‌خواهید فیلتر بعد از AuthoritiesLoiteringFilter بیاید
                 .authorizeHttpRequests()
                 .requestMatchers("/myAccount").hasRole("USER")
                 .requestMatchers("/myLoans").hasRole("USER")
