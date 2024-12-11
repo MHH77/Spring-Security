@@ -20,9 +20,10 @@ This project demonstrates the integration and usage of Spring Security in Java-b
    git clone https://github.com/MHH77/Spring-Security.git
    
 2. Import the project into your IDE (e.g., IntelliJ IDEA, Eclipse).
+   
 3. Build and run the application using Maven or Gradle:
-```bash
-   mvn spring-boot:run
+   ```bash
+      mvn spring-boot:run
 
 ## Usage
   Configure security settings in application.properties or application.yml.
